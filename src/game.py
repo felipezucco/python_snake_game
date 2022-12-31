@@ -1,8 +1,10 @@
 from snake import Snake, Status
 from rabbit import Rabbit
-from utils import GROUND, on_press, thread, is_a_valid_controller, choice_direction, move, timer, calculate_shock, calculate_shock_line, new_coord_respawn, \
-    get_level_speed
+from utils import on_press, is_a_valid_controller, choice_direction, move, timer, calculate_shock, calculate_shock_line, new_coord_respawn, \
+    get_level_speed, build_ground, is_a_valid_input
 import curses
+import threading
+import asyncio
 
 
 class Game:
@@ -10,10 +12,11 @@ class Game:
     _snake: Snake = None
     _rabbit: Rabbit = None
     _level: int = 1
+    _kill_threads = False
 
-    def __init__(self, p_stdscr, p_snake, p_rabbit):
-        self._snake = p_snake
-        self._rabbit = p_rabbit
+    def __init__(self, p_stdscr):
+        self._snake = Snake()
+        self._rabbit = Rabbit()
         self._stdscr = p_stdscr
 
     def run(self):
@@ -22,20 +25,26 @@ class Game:
     def __start_threads(self):
         # Keyboard listener for inputs
         on_press(lambda e: self.__input_listener(e))
+        self.__start_actors()
 
+    def __start_actors(self):
         # Create rabbits thread
-        t_rabbit = thread(self.__run_rabbit)
+        t_rabbit = threading.Thread(target=self.__run_rabbit)
         t_rabbit.start()
 
         # Create snakes thread
-        t_snake = thread(self.__run_snake)
+        t_snake = threading.Thread(target=self.__run_snake)
         t_snake.start()
 
     def __input_listener(self, key):
         snake = self._snake
 
-        if is_a_valid_controller(key.name):
-            snake.set_direction(key.name)
+        if is_a_valid_input(key.name):
+            if is_a_valid_controller(key.name) and snake.get_did_last_moviment():
+                snake.set_direction(key.name)
+                snake.set_did_last_moviment(False)
+            elif key.name == "r":
+                self.__reset_game()
 
     def __run_rabbit(self):
         rabbit = self._rabbit
@@ -43,10 +52,9 @@ class Game:
         snake = self._snake
         xr, yr = rabbit.get_position()
 
-        # Start loop for run rabbit
         while True:
             if not rabbit.is_dead():
-                stdscr.addstr(yr, xr, GROUND)  # remove old rabbit's position
+                build_ground(stdscr, xr, yr)  # remove old rabbit's position
 
                 # Check new position to avoid shock with snake
                 with_shock = True
@@ -56,13 +64,17 @@ class Game:
                     with_shock = calculate_shock_line((xr, yr), snake.get_body())
 
                 rabbit.set_position((xr, yr))
-                stdscr.addstr(yr, xr, "R", curses.color_pair(9))  #
+                stdscr.addstr(yr, xr, "o", curses.color_pair(9))  #
                 stdscr.refresh()
                 timer(get_level_speed(False, self._level))
             else:
                 timer(3)
                 rabbit.respawn(new_coord_respawn())
 
+    def __reset_game(self):
+        self._snake.start_snake()
+        self._rabbit.start_rabbit()
+        self._level = 1
 
     def __run_snake(self):
         stdscr = self._stdscr
@@ -74,10 +86,10 @@ class Game:
             stdscr.refresh()
 
         # Start loop for run snake
-        while True:
+        while not self._kill_threads:
             if snake.get_status() == Status.NORMAL:
                 xst, yst = snake.get_tail()
-                stdscr.addstr(yst, xst, GROUND)
+                build_ground(stdscr, xst, yst)
                 stdscr.refresh()
                 snake.remove_tail()
             elif snake.get_status() == Status.GROW_UP:
@@ -90,6 +102,7 @@ class Game:
             if self.__snake_shock():
                 break
 
+            snake.set_did_last_moviment(True)
             timer(get_level_speed(True, self._level))
 
     def __snake_shock(self):

@@ -1,10 +1,14 @@
 import curses
 import time
 from curses.textpad import rectangle
+
+import keyboard
+
 from snake import Snake
 from game import Game
 from rabbit import Rabbit
-from configurations import HEIGHT, WIDTH, TOP_PADDING, LEFT_PADDING, MARGIN, SCREEN_TOP, SCREEN_WIDTH, STROKE_TOP, STROKE_LEFT
+from configurations import HEIGHT, WIDTH, TOP_PADDING, LEFT_PADDING, MARGIN, SCREEN_TOP, SCREEN_WIDTH, STROKE_TOP, STROKE_LEFT, STROKE_BOTTOM, STROKE_RIGHT, \
+    FIELD_RIGHT, FIELD_BOTTOM, FIELD_TOP, FIELD_LEFT
 
 
 stdscr = curses.initscr()
@@ -16,33 +20,47 @@ colors = {'white': curses.COLOR_WHITE, 'red': curses.COLOR_RED, 'green': curses.
 def scr_configuration(p_stdscr):
     curses.start_color()
     curses.use_default_colors()
-    set_pairs(1, 1)
+    set_pairs()
     curses.cbreak()  # avoid close window after input
     curses.curs_set(0)  # hide cursor
     curses.resize_term(SCREEN_TOP, SCREEN_WIDTH)
     p_stdscr.clear()  # first cleaning
     p_stdscr.keypad(True)
     p_stdscr.nodelay(True)  # non-blocking input
-    rectangle(p_stdscr, MARGIN + TOP_PADDING, MARGIN + LEFT_PADDING, MARGIN + TOP_PADDING
-              + HEIGHT, MARGIN + LEFT_PADDING + WIDTH)
+    build_strokes(p_stdscr)
+    fill_grid(p_stdscr)
 
-def set_pairs(fg, bg):
-    curses.init_pair(1, fg, colors['black'])
-    curses.init_pair(2, fg, colors['yellow'])
-    curses.init_pair(3, fg, colors['white'])
-    curses.init_pair(4, fg, colors['red'])
-    curses.init_pair(5, colors['black'], bg)
-    curses.init_pair(6, colors['yellow'], bg)
-    curses.init_pair(7, colors['white'], bg)
-    curses.init_pair(8, colors['red'], bg)
-    curses.init_pair(9, colors['red'], 0)
-    curses.init_pair(10, colors['green'], colors['green'])
+
+def build_strokes(p_stdscr):
+    # Top/Bottom Strokes
+    for i in range(STROKE_LEFT, STROKE_RIGHT + 1):
+        p_stdscr.addstr(STROKE_TOP, i, "x", curses.color_pair(12))
+        p_stdscr.addstr(STROKE_BOTTOM, i, "x", curses.color_pair(12))
+
+    # Left/Right Strokes
+    for i in range(STROKE_TOP, STROKE_BOTTOM + 1):
+        p_stdscr.addstr(i, STROKE_LEFT, "x", curses.color_pair(12))
+        p_stdscr.addstr(i, STROKE_RIGHT, "x", curses.color_pair(12))
+
+
+def fill_grid(p_stdscr):
+    for i in range(FIELD_LEFT, FIELD_RIGHT + 1):
+        for j in range(FIELD_TOP, FIELD_BOTTOM + 1):
+            p_stdscr.addstr(j, i, " ", curses.color_pair(13))
+
+
+def set_pairs():
+    curses.init_pair(9, colors['magenta'], colors['white'])
+    curses.init_pair(10, colors['green'], colors['white'])
+    curses.init_pair(11, colors['blue'], colors['blue'])
+    curses.init_pair(12, colors['yellow'], colors['yellow'])
+    curses.init_pair(13, colors['white'], colors['white'])
+    curses.init_pair(14, colors['green'], colors['green'])
+
 
 def main(p_stdscr):
     scr_configuration(p_stdscr)
-    snake = Snake()
-    rabbit = Rabbit()
-    game = Game(p_stdscr, snake, rabbit)
+    game = Game(p_stdscr)
     game.run()
 
 

@@ -1,12 +1,14 @@
 
 class Rabbit:
     _is_dead = False
-
-    _game = None
     _position = (15, 15)
 
     def __init__(self):
-        pass
+        self.start_rabbit()
+
+    def start_rabbit(self):
+        self._is_dead = False
+        self._position = (15, 15)
 
     def is_dead(self):
         return self._is_dead
