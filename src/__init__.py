@@ -1,13 +1,6 @@
 import curses
-import time
-from curses.textpad import rectangle
-
-import keyboard
-
-from snake import Snake
 from game import Game
-from rabbit import Rabbit
-from configurations import HEIGHT, WIDTH, TOP_PADDING, LEFT_PADDING, MARGIN, SCREEN_TOP, SCREEN_WIDTH, STROKE_TOP, STROKE_LEFT, STROKE_BOTTOM, STROKE_RIGHT, \
+from default_configurations import HEIGHT, WIDTH, TOP_PADDING, LEFT_PADDING, MARGIN, SCREEN_TOP, SCREEN_WIDTH, STROKE_TOP, STROKE_LEFT, STROKE_BOTTOM, STROKE_RIGHT, \
     FIELD_RIGHT, FIELD_BOTTOM, FIELD_TOP, FIELD_LEFT
 
 
@@ -64,4 +57,5 @@ def main(p_stdscr):
     game.run()
 
 
-curses.wrapper(main)
+if __name__ == "__main__":
+    curses.wrapper(main)

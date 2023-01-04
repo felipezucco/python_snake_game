@@ -1,13 +1,11 @@
 from random import choice, randint
 from time import sleep
-from threading import Thread
-from configurations import FIELD_LEFT, FIELD_RIGHT, FIELD_BOTTOM, FIELD_TOP, AUXILIARIES, OPOSITES_DIRECTIONS, CONTROLLERS, VALID_INPUTS, GROUND, MARGIN
-from configurations import SCREEN_WIDTH, SCREEN_TOP, LEVEL_SNAKE_SPEED, LEVEL_RABBIT_SPEED
-from keyboard import on_press
+from default_configurations import FIELD_LEFT, FIELD_RIGHT, FIELD_BOTTOM, FIELD_TOP, AUXILIARIES, OPOSITES_DIRECTIONS, CONTROLLERS, VALID_INPUTS, GROUND, MARGIN
+from default_configurations import SCREEN_WIDTH, SCREEN_TOP, LEVEL_SNAKE_SPEED, LEVEL_RABBIT_SPEED, SNAKES_START_LENGTH
 import curses
 
 
-# Increment/decrement coordenate to move character accordingly setted direction
+# Increment/decrement coordinate to move character accordingly set a direction
 def move(p_origin, p_direction) -> tuple:
     x, y = p_origin[0], p_origin[1]
 

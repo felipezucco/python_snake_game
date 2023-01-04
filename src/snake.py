@@ -1,4 +1,4 @@
-from utils import CONTROLLERS, OPOSITES_DIRECTIONS
+from utils import CONTROLLERS, OPOSITES_DIRECTIONS, SNAKES_START_LENGTH, FIELD_TOP
 
 
 class Status:
@@ -6,6 +6,8 @@ class Status:
     GROW_UP = 1
 
 
+# Class for build Snakes properties and method.
+# All the logical programming is in the Game class.
 class Snake:
     _body = []
     _rabbits = 0
@@ -17,7 +19,7 @@ class Snake:
         self.start_snake()
 
     def start_snake(self):
-        self._body = [(i, 10) for i in range(10, 20)]
+        self._body = [(i, FIELD_TOP) for i in range(FIELD_TOP, FIELD_TOP + SNAKES_START_LENGTH)]
         self._last_direction = "right"
         self._did_last_moviment = True
         self._status = Status.NORMAL
@@ -57,7 +59,7 @@ class Snake:
                 and self._last_direction != OPOSITES_DIRECTIONS[p_direction]:
             self._last_direction = p_direction
 
-    def set_did_last_moviment(self, p_param: bool) -> bool:
+    def set_did_last_moviment(self, p_param: bool):
         self._did_last_moviment = p_param
 
     def get_did_last_moviment(self):

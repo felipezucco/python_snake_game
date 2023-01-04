@@ -1,7 +1,8 @@
-
+# Class for build Rabbits properties and method.
+# All the logical programming is in the Game class.
 class Rabbit:
     _is_dead = False
-    _position = (15, 15)
+    _position = None
 
     def __init__(self):
         self.start_rabbit()

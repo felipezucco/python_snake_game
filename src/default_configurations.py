@@ -2,6 +2,7 @@ GROUND = " "
 CONTROLLERS = ("right", "left", "up", "down")
 AUXILIARIES = "space", "r",
 OPOSITES_DIRECTIONS = {"right": "left", "left": "right", "up": "down", "down": "up"}
+SNAKES_START_LENGTH = 10
 VALID_INPUTS = CONTROLLERS + AUXILIARIES
 HEIGHT = 30
 WIDTH = 80
